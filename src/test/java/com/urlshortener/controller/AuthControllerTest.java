@@ -2,22 +2,23 @@ package com.urlshortener.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.urlshortener.dto.AuthRequest;
+import com.urlshortener.entity.User;
 import com.urlshortener.security.JwtTokenProvider;
 import com.urlshortener.service.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AuthController.class)
+@WebMvcTest(controllers = AuthController.class, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 class AuthControllerTest {
 
     @Autowired
@@ -67,7 +68,8 @@ class AuthControllerTest {
     void testRegister_ValidRequest_CreatesUser() throws Exception {
         // Given
         AuthRequest request = new AuthRequest("newuser", "password123");
-        doNothing().when(userService).createUser(anyString(), anyString(), anyString());
+        when(userService.createUser(anyString(), anyString(), anyString()))
+                .thenReturn(new User("newuser", "newuser@example.com", "password123"));
 
         // When/Then
         mockMvc.perform(post("/api/auth/register")

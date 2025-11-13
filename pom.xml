@@ -24,9 +24,10 @@
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <junit.version>5.10.1</junit.version>
-        <mockito.version>5.7.0</mockito.version>
-        <jacoco.version>0.8.11</jacoco.version>
-        <pitest.version>1.15.0</pitest.version>
+        <mockito.version>5.14.2</mockito.version>
+        <jacoco.version>0.8.13</jacoco.version>
+        <pitest.version>1.16.1</pitest.version>
+        <pitest.junit5.plugin.version>1.2.2</pitest.junit5.plugin.version>
         <jmh.version>1.37</jmh.version>
         <openjml.version>0.9.0</openjml.version>
     </properties>
@@ -206,6 +207,10 @@
                         <goals>
                             <goal>prepare-agent</goal>
                         </goals>
+                        <configuration>
+                            <destFile>${project.build.directory}/jacoco.exec</destFile>
+                            <append>true</append>
+                        </configuration>
                     </execution>
                     <execution>
                         <id>jacoco-site</id>
@@ -256,6 +261,13 @@
                     </outputFormats>
                     <mutationThreshold>70</mutationThreshold>
                     <coverageThreshold>80</coverageThreshold>
+                    <timeoutFactor>3.0</timeoutFactor>
+                    <timeoutConstant>10000</timeoutConstant>
+                    <excludedClasses>
+                        <param>*$$SpringCGLIB$$*</param>
+                        <param>*$$SpringProxy$$*</param>
+                        <param>*$$EnhancerBySpringCGLIB$$*</param>
+                    </excludedClasses>
                 </configuration>
                 <executions>
                     <execution>
@@ -266,6 +278,13 @@
                         </goals>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.pitest</groupId>
+                        <artifactId>pitest-junit5-plugin</artifactId>
+                        <version>${pitest.junit5.plugin.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
 
             <!-- JMH -->

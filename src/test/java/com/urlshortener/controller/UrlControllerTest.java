@@ -3,12 +3,15 @@ package com.urlshortener.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.urlshortener.dto.ShortenUrlRequest;
 import com.urlshortener.entity.ShortUrl;
+import com.urlshortener.security.JwtTokenProvider;
 import com.urlshortener.service.UrlShortenerService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
@@ -20,7 +23,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(UrlController.class)
+@WebMvcTest(controllers = { UrlController.class,
+        RedirectController.class }, excludeAutoConfiguration = SecurityAutoConfiguration.class)
 class UrlControllerTest {
 
     @Autowired
@@ -28,6 +32,9 @@ class UrlControllerTest {
 
     @MockBean
     private UrlShortenerService urlShortenerService;
+
+    @MockBean
+    private JwtTokenProvider tokenProvider;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -61,6 +68,7 @@ class UrlControllerTest {
     }
 
     @Test
+    @WithMockUser
     void testGetStatistics_ValidCode_ReturnsStatistics() throws Exception {
         // Given
         String shortCode = "ABCD1234";
@@ -68,7 +76,7 @@ class UrlControllerTest {
         shortUrl.setClickCount(10L);
         shortUrl.setCreatedAt(LocalDateTime.now());
         shortUrl.setExpiresAt(LocalDateTime.now().plusYears(1));
-        
+
         when(urlShortenerService.getStatistics(shortCode)).thenReturn(Optional.of(shortUrl));
 
         // When/Then
@@ -79,6 +87,7 @@ class UrlControllerTest {
     }
 
     @Test
+    @WithMockUser
     void testGetStatistics_InvalidCode_ReturnsNotFound() throws Exception {
         // Given
         String shortCode = "INVALID";
@@ -113,4 +122,3 @@ class UrlControllerTest {
                 .andExpect(status().isNotFound());
     }
 }
-
