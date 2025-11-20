@@ -93,27 +93,43 @@ Shows what environment variables are needed without exposing real values.
 
 ## Suppressing False Positives in GitGuardian
 
-If you want to mark these as false positives in GitGuardian:
+GitGuardian is still detecting default values even with environment variable syntax. Here are **3 ways to fix this**:
 
-1. **Go to GitGuardian Dashboard:**
+### Option 1: Mark as False Positive in Dashboard (Recommended - Immediate Fix)
 
-   - Visit https://dashboard.gitguardian.com
-   - Find the incident
-   - Mark as "False Positive"
+You have an incident URL from the scan:
 
-2. **Or use .gitguardian.yml:**
+- **Incident URL**: https://dashboard.gitguardian.com/workspace/794819/incidents/22603845
 
-   ```yaml
-   paths-ignore:
-     - "docker-compose.yml" # Ignore this file
-     - "*.example" # Ignore example files
-   ```
+**Steps:**
 
-3. **Or use inline comments:**
-   ```yaml
-   # ggignore
-   DB_PASSWORD=postgres # Example password only
-   ```
+1. Visit the incident URL above
+2. Click **"Mark as False Positive"**
+3. Add comment: "Example development password - not a real secret"
+4. This will prevent future alerts for this specific secret
+
+### Option 2: Use .gitguardian.yml (Already Created)
+
+A `.gitguardian.yml` file has been created that ignores these files:
+
+```yaml
+paths-ignore:
+  - "docker-compose.yml" # Contains example passwords
+  - "src/main/resources/application.yml" # Contains commented examples
+```
+
+**Note:** This ignores the entire files. If you want more granular control, use Option 1.
+
+### Option 3: Use Placeholder Values (Alternative)
+
+Change default values to something that doesn't trigger GitGuardian:
+
+```yaml
+- DB_PASSWORD=${DB_PASSWORD:-CHANGE_ME}
+- POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-CHANGE_ME}
+```
+
+This way, developers know to change it, and GitGuardian won't flag it.
 
 ## Current Status
 

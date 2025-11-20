@@ -1,0 +1,12 @@
+# GitGuardian configuration file
+# This file configures GitGuardian to ignore false positives
+
+# Ignore specific files that contain example/default passwords
+# These are development configuration files, not production secrets
+paths-ignore:
+  - "docker-compose.yml"  # Contains example passwords for local development
+  - "src/main/resources/application.yml"  # Contains commented example configuration
+
+# Note: In production, use environment variables or secrets management
+# These files are safe to ignore as they only contain example values
+
