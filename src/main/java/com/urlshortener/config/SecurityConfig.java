@@ -29,10 +29,22 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
+                // Web UI pages (JavaScript will handle authentication checks)
                 .requestMatchers("/").permitAll()
+                .requestMatchers("/login").permitAll()
+                .requestMatchers("/register").permitAll()
+                .requestMatchers("/dashboard").permitAll()
+                .requestMatchers("/stats/**").permitAll()
+                // Static resources
+                .requestMatchers("/css/**").permitAll()
+                .requestMatchers("/js/**").permitAll()
+                .requestMatchers("/images/**").permitAll()
+                // API endpoints
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/api/shorten").permitAll()
+                .requestMatchers("/api/stats/**").authenticated() // Stats API requires auth
                 .requestMatchers("/{shortCode}").permitAll()
+                // H2 Console and Actuator
                 .requestMatchers("/h2-console/**").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
                 .anyRequest().authenticated()

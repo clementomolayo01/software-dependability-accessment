@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - URL Shortener</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>🔗 URL Shortener</h1>
+            </div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <span class="username" th:text="${username}">User</span>
+                <a href="#" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+
+        <div class="dashboard-header" style="margin-top: 60px;">
+            <h2>Your Dashboard</h2>
+            <p>Manage and track your shortened URLs</p>
+        </div>
+
+        <div class="shorten-form-container">
+            <form id="shortenForm" class="shorten-form">
+                <div class="form-group">
+                    <input 
+                        type="url" 
+                        id="urlInput" 
+                        placeholder="Enter your long URL here" 
+                        required
+                        class="url-input">
+                </div>
+                <button type="submit" class="btn btn-primary">Shorten URL</button>
+            </form>
+        </div>
+
+        <div id="resultContainer" class="result-container" style="display: none;">
+            <div class="result-box">
+                <h3>Your Short URL:</h3>
+                <div class="result-url">
+                    <input type="text" id="shortUrlOutput" readonly class="url-output">
+                    <button onclick="copyToClipboard()" class="btn btn-secondary">Copy</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="urls-section">
+            <h3>Your URLs</h3>
+            <div id="urlsList" class="urls-list">
+                <p class="empty-state">No URLs shortened yet. Create your first short URL above!</p>
+            </div>
+        </div>
+
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+    </main>
+
+    <script th:inline="javascript">
+        const token = /*[[${token}]]*/ null;
+        const username = /*[[${username}]]*/ 'User';
+    </script>
+    <script th:src="@{/js/dashboard.js}"></script>
+</body>
+</html>
+

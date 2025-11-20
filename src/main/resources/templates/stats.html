@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Statistics - URL Shortener</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>🔗 URL Shortener</h1>
+            </div>
+            <div class="nav-links">
+                <a href="/">Home</a>
+                <a href="/dashboard">Dashboard</a>
+                <a href="#" onclick="logout()">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="stats-header">
+            <h2>URL Statistics</h2>
+            <a href="/dashboard" class="btn btn-secondary">← Back to Dashboard</a>
+        </div>
+
+        <div id="statsContainer" class="stats-container">
+            <div class="loading">Loading statistics...</div>
+        </div>
+
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+    </main>
+
+    <script th:inline="javascript">
+        const token = /*[[${token}]]*/ null;
+        const shortCode = /*[[${shortCode}]]*/ '';
+    </script>
+    <script th:src="@{/js/stats.js}"></script>
+</body>
+</html>
+

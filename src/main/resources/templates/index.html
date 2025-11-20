@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Shortener - Shorten Your Links</title>
+    <link rel="icon" type="image/svg+xml" th:href="@{/images/favicon.svg}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">
+                <h1>🔗 URL Shortener</h1>
+            </div>
+            <div class="nav-links" id="navLinks">
+                <a id="loginLink" href="/login">Login</a>
+                <a id="registerLink" href="/register">Register</a>
+                <a id="dashboardLink" href="/dashboard" style="display: none;">Dashboard</a>
+                <a id="logoutLink" href="#" onclick="logout(); return false;" style="display: none;">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        <div class="hero" style="margin-top: 60px;">
+            <h2>Shorten Your URLs Instantly</h2>
+            <p>Create short, memorable links for easy sharing</p>
+        </div>
+
+        <div class="shorten-form-container">
+            <form id="shortenForm" class="shorten-form">
+                <div class="form-group">
+                    <input 
+                        type="url" 
+                        id="urlInput" 
+                        placeholder="Enter your long URL here (e.g., https://example.com)" 
+                        required
+                        class="url-input">
+                </div>
+                <button type="submit" class="btn btn-primary">Shorten URL</button>
+            </form>
+        </div>
+
+        <div id="resultContainer" class="result-container" style="display: none;">
+            <div class="result-box">
+                <h3>Your Short URL:</h3>
+                <div class="result-url">
+                    <input type="text" id="shortUrlOutput" readonly class="url-output">
+                    <button onclick="copyToClipboard()" class="btn btn-secondary">Copy</button>
+                </div>
+                <p class="result-info">Original URL: <span id="originalUrl"></span></p>
+            </div>
+        </div>
+
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 URL Shortener. Production-grade URL shortening service.</p>
+        </div>
+    </footer>
+
+    <script th:src="@{/js/app.js}"></script>
+    <script>
+        // Update navigation based on authentication status
+        document.addEventListener('DOMContentLoaded', function() {
+            const token = localStorage.getItem('token');
+            const loginLink = document.getElementById('loginLink');
+            const registerLink = document.getElementById('registerLink');
+            const dashboardLink = document.getElementById('dashboardLink');
+            const logoutLink = document.getElementById('logoutLink');
+            
+            if (token) {
+                loginLink.style.display = 'none';
+                registerLink.style.display = 'none';
+                dashboardLink.style.display = 'inline';
+                logoutLink.style.display = 'inline';
+            } else {
+                loginLink.style.display = 'inline';
+                registerLink.style.display = 'inline';
+                dashboardLink.style.display = 'none';
+                logoutLink.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
+
