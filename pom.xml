@@ -23,6 +23,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <sonar.organization>naijawebmaster1</sonar.organization>
         <junit.version>5.10.1</junit.version>
         <mockito.version>5.14.2</mockito.version>
         <jacoco.version>0.8.13</jacoco.version>
