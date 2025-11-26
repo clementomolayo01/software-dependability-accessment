@@ -51,7 +51,7 @@ jobs:
       - name: Check coverage threshold
         run: mvn jacoco:check
 
-    mutation-testing:
+  mutation-testing:
     name: Mutation Testing (PiTest)
     runs-on: ubuntu-latest
 
@@ -70,7 +70,7 @@ jobs:
         run: mvn clean test-compile org.pitest:pitest-maven:mutationCoverage
 
       - name: Upload mutation test reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4 
         with:
           name: pitest-reports
           path: target/pit-reports/
