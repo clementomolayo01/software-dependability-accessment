@@ -258,6 +258,7 @@
                 <groupId>org.pitest</groupId>
                 <artifactId>pitest-maven</artifactId>
                 <version>${pitest.version}</version>
+
                 <configuration>
                     <targetClasses>
                         <param>com.urlshortener.service.*</param>
@@ -280,15 +281,7 @@
                         <param>*$$EnhancerBySpringCGLIB$$*</param>
                     </excludedClasses>
                 </configuration>
-                <executions>
-                    <execution>
-                        <id>pitest</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>mutationCoverage</goal>
-                        </goals>
-                    </execution>
-                </executions>
+
                 <dependencies>
                     <dependency>
                         <groupId>org.pitest</groupId>
