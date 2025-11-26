@@ -65,7 +65,6 @@ jobs:
         java-version: ${{ env.JAVA_VERSION }}
         distribution: "temurin"
         cache: maven
-
     - name: Run mutation tests
       run: mvn clean test-compile org.pitest:pitest-maven:mutationCoverage
 
