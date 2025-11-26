@@ -70,7 +70,7 @@ jobs:
         run: mvn org.pitest:pitest-maven:mutationCoverage
 
       - name: Upload mutation test reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4 
         with:
           name: pitest-reports
           path: target/pit-reports/
@@ -189,7 +189,7 @@ jobs:
           java -jar target/benchmarks.jar
 
       - name: Upload benchmark results
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: benchmark-results
           path: target/benchmarks.jar
