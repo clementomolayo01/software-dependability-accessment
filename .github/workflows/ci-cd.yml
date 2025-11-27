@@ -92,9 +92,10 @@ jobs:
 
       - name: Install OpenJML
         run: |
-          wget https://github.com/OpenJML/OpenJML/releases/download/0.9.0/openjml-0.9.0.zip
-          unzip openjml-0.9.0.zip
-          export PATH=$PATH:$(pwd)/openjml
+          wget -O openjml.zip https://github.com/OpenJML/OpenJML/releases/download/0.17.0-alpha-15/openjml-ubuntu-20.04-0.17.0-alpha-15.zip
+          mkdir openjml
+          unzip -d ./openjml openjml.zip
+          ls openjml
 
       - name: Verify JML contracts
         run: |
