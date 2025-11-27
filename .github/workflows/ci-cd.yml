@@ -92,8 +92,8 @@ jobs:
 
       - name: Install OpenJML
         run: |
-          wget https://github.com/OpenJML/OpenJML/releases/download/0.9.0/openjml-0.9.0.zip
-          unzip openjml-0.9.0.zip
+          wget https://github.com/OpenJML/OpenJML/releases/download/21-0.18/openjml-linux-21-0.18-dev.zip
+          unzip openjml-linux-21-0.18-dev.zip
           export PATH=$PATH:$(pwd)/openjml
 
       - name: Verify JML contracts
