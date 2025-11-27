@@ -89,19 +89,40 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: "temurin"
           cache: maven
-
-      - name: Install OpenJML
+          
+      - name: Install jq (for JSON parsing)
         run: |
-          wget https://github.com/OpenJML/OpenJML/releases/download/0.9.0/openjml-0.9.0.zip
-          unzip openjml-0.9.0.zip
-          export PATH=$PATH:$(pwd)/openjml
+          sudo apt-get update
+          sudo apt-get install -y jq
+      
+      - name: Download and install OpenJML
+        run: |
+          # Get latest OpenJML release .zip asset URL from GitHub API
+          curl -s https://api.github.com/repos/OpenJML/OpenJML/releases/latest \
+            | jq -r '.assets[] | select(.name | endswith(".zip")) | .browser_download_url' \
+            | head -n 1 > openjml_url.txt
+
+          url=$(cat openjml_url.txt)
+          echo "Downloading OpenJML from $url"
+          curl -L "$url" -o openjml.zip
+
+          # Unzip into a folder
+          unzip -q openjml.zip -d openjml-dist
+
+          # Find the directory containing openjml.jar
+          OJ=$(find openjml-dist -maxdepth 4 -type f -name "openjml.jar" -print | head -n 1 | xargs dirname)
+          echo "Detected OPENJML_HOME=$OJ"
+
+          # Export for later steps
+          echo "OPENJML_HOME=$OJ" >> $GITHUB_ENV
 
       - name: Verify JML contracts
         run: |
-          mvn clean compile
-          # OpenJML verification would be run here
-          # For now, we'll just ensure compilation succeeds
-          echo "JML verification placeholder - OpenJML integration requires additional setup"
+          echo "Using OPENJML_HOME=$OPENJML_HOME"
+          java -jar "$OPENJML_HOME/openjml.jar" -version
+
+          # Run JML checks on your source code
+          java -jar "$OPENJML_HOME/openjml.jar" -check -dir src/main/java
 
   security-scanning:
     name: Security Scanning
