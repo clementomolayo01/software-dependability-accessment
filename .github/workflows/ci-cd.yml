@@ -75,6 +75,183 @@ jobs:
           name: pitest-reports
           path: target/pit-reports/
 
+    jml-verification:
+    name: JML Verification (OpenJML)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+
+      - name: Install jq (for JSON parsing)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Download and install OpenJML (Linux CLI)
+        run: |
+          # Get latest release and pick the Linux zip asset
+          curl -s https://api.github.com/repos/OpenJML/OpenJML/releases/latest \
+            | jq -r '.assets[] | select(.name | contains("linux") and endswith(".zip")) | .browser_download_url' \
+            | head -n 1 > openjml_url.txt
+
+          url=$(cat openjml_url.txt)
+          if [ -z "$url" ]; then
+            echo "Could not find a Linux OpenJML .zip asset in latest release" >&2
+            exit 1
+          fi
+
+          echo "Downloading OpenJML from $url"
+          curl -L "$url" -o openjml.zip
+
+          # Unzip into a folder
+          unzip -q openjml.zip -d openjml-dist
+
+          # Find the 'openjml' executable (not openjml.jar)
+          OJ=$(find openjml-dist -maxdepth 5 -type f -name "openjml" -print | head -n 1 | xargs dirname || true)
+
+          if [ -z "$OJ" ]; then
+            echo "Could not locate 'openjml' executable after unzip" >&2
+            echo "Contents of openjml-dist:"
+            ls -R openjml-dist
+            exit 1
+          fi
+
+          echo "Detected OPENJML_HOME=$OJ"
+          echo "OPENJML_HOME=$OJ" >> $GITHUB_ENV
+
+      - name: Verify JML contracts
+        run: |
+          echo "Using OPENJML_HOME=$OPENJML_HOME"
+          "$OPENJML_HOME/openjml" --version
+
+          # Run JML checks on your Java sources
+          "$OPENJML_HOME/openjml" -check -dir src/main/java
+    jml-verification:
+    name: JML Verification (OpenJML)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+
+      - name: Install jq (for JSON parsing)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Download and install OpenJML (Linux CLI)
+        run: |
+          # Get latest release and pick the Linux zip asset
+          curl -s https://api.github.com/repos/OpenJML/OpenJML/releases/latest \
+            | jq -r '.assets[] | select(.name | contains("linux") and endswith(".zip")) | .browser_download_url' \
+            | head -n 1 > openjml_url.txt
+
+          url=$(cat openjml_url.txt)
+          if [ -z "$url" ]; then
+            echo "Could not find a Linux OpenJML .zip asset in latest release" >&2
+            exit 1
+          fi
+
+          echo "Downloading OpenJML from $url"
+          curl -L "$url" -o openjml.zip
+
+          # Unzip into a folder
+          unzip -q openjml.zip -d openjml-dist
+
+          # Find the 'openjml' executable (not openjml.jar)
+          OJ=$(find openjml-dist -maxdepth 5 -type f -name "openjml" -print | head -n 1 | xargs dirname || true)
+
+          if [ -z "$OJ" ]; then
+            echo "Could not locate 'openjml' executable after unzip" >&2
+            echo "Contents of openjml-dist:"
+            ls -R openjml-dist
+            exit 1
+          fi
+
+          echo "Detected OPENJML_HOME=$OJ"
+          echo "OPENJML_HOME=$OJ" >> $GITHUB_ENV
+
+      - name: Verify JML contracts
+        run: |
+          echo "Using OPENJML_HOME=$OPENJML_HOME"
+          "$OPENJML_HOME/openjml" --version
+
+          # Run JML checks on your Java sources
+          "$OPENJML_HOME/openjml" -check -dir src/main/java
+    jml-verification:
+    name: JML Verification (OpenJML)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
+
+      - name: Install jq (for JSON parsing)
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+
+      - name: Download and install OpenJML (Linux CLI)
+        run: |
+          # Get latest release and pick the Linux zip asset
+          curl -s https://api.github.com/repos/OpenJML/OpenJML/releases/latest \
+            | jq -r '.assets[] | select(.name | contains("linux") and endswith(".zip")) | .browser_download_url' \
+            | head -n 1 > openjml_url.txt
+
+          url=$(cat openjml_url.txt)
+          if [ -z "$url" ]; then
+            echo "Could not find a Linux OpenJML .zip asset in latest release" >&2
+            exit 1
+          fi
+
+          echo "Downloading OpenJML from $url"
+          curl -L "$url" -o openjml.zip
+
+          # Unzip into a folder
+          unzip -q openjml.zip -d openjml-dist
+
+          # Find the 'openjml' executable (not openjml.jar)
+          OJ=$(find openjml-dist -maxdepth 5 -type f -name "openjml" -print | head -n 1 | xargs dirname || true)
+
+          if [ -z "$OJ" ]; then
+            echo "Could not locate 'openjml' executable after unzip" >&2
+            echo "Contents of openjml-dist:"
+            ls -R openjml-dist
+            exit 1
+          fi
+
+          echo "Detected OPENJML_HOME=$OJ"
+          echo "OPENJML_HOME=$OJ" >> $GITHUB_ENV
+
+      - name: Verify JML contracts
+        run: |
+          echo "Using OPENJML_HOME=$OPENJML_HOME"
+          "$OPENJML_HOME/openjml" --version
+
+          # Run JML checks on your Java sources
+          "$OPENJML_HOME/openjml" -check -dir src/main/java
   jml-verification:
     name: JML Verification (OpenJML)
     runs-on: ubuntu-latest
@@ -87,42 +264,53 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
-          distribution: "temurin"
+          distribution: temurin
           cache: maven
-          
+
       - name: Install jq (for JSON parsing)
         run: |
           sudo apt-get update
           sudo apt-get install -y jq
-      
-      - name: Download and install OpenJML
+
+      - name: Download and install OpenJML (Linux CLI)
         run: |
-          # Get latest OpenJML release .zip asset URL from GitHub API
+          # Get latest release and pick the Linux zip asset
           curl -s https://api.github.com/repos/OpenJML/OpenJML/releases/latest \
-            | jq -r '.assets[] | select(.name | endswith(".zip")) | .browser_download_url' \
+            | jq -r '.assets[] | select(.name | contains("linux") and endswith(".zip")) | .browser_download_url' \
             | head -n 1 > openjml_url.txt
 
           url=$(cat openjml_url.txt)
+          if [ -z "$url" ]; then
+            echo "Could not find a Linux OpenJML .zip asset in latest release" >&2
+            exit 1
+          fi
+
           echo "Downloading OpenJML from $url"
           curl -L "$url" -o openjml.zip
 
           # Unzip into a folder
           unzip -q openjml.zip -d openjml-dist
 
-          # Find the directory containing openjml.jar
-          OJ=$(find openjml-dist -maxdepth 4 -type f -name "openjml.jar" -print | head -n 1 | xargs dirname)
-          echo "Detected OPENJML_HOME=$OJ"
+          # Find the 'openjml' executable (not openjml.jar)
+          OJ=$(find openjml-dist -maxdepth 5 -type f -name "openjml" -print | head -n 1 | xargs dirname || true)
 
-          # Export for later steps
+          if [ -z "$OJ" ]; then
+            echo "Could not locate 'openjml' executable after unzip" >&2
+            echo "Contents of openjml-dist:"
+            ls -R openjml-dist
+            exit 1
+          fi
+
+          echo "Detected OPENJML_HOME=$OJ"
           echo "OPENJML_HOME=$OJ" >> $GITHUB_ENV
 
       - name: Verify JML contracts
         run: |
           echo "Using OPENJML_HOME=$OPENJML_HOME"
-          java -jar "$OPENJML_HOME/openjml.jar" -version
+          "$OPENJML_HOME/openjml" --version
 
-          # Run JML checks on your source code
-          java -jar "$OPENJML_HOME/openjml.jar" -check -dir src/main/java
+          # Run JML checks on your Java sources
+          "$OPENJML_HOME/openjml" -check -dir src/main/java
 
   security-scanning:
     name: Security Scanning
