@@ -312,6 +312,7 @@
                                 </goals>
                                 <configuration>
                                     <mainClass>org.openjdk.jmh.Main</mainClass>
+                                    <classpathScope>test</classpathScope>
                                     <arguments>
                                         <argument>-f</argument>
                                         <argument>1</argument>
