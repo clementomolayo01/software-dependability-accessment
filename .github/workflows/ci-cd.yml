@@ -202,12 +202,4 @@ jobs:
           cache: maven
 
       - name: Run JMH benchmarks
-        run: |
-          mvn clean package -DskipTests -Pbenchmarks
-          java -jar target/benchmarks.jar
-
-      - name: Upload benchmark results
-        uses: actions/upload-artifact@v4
-        with:
-          name: benchmark-results
-          path: target/benchmarks.jar
+        run: mvn clean verify -DskipTests -Pbenchmarks
