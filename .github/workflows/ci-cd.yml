@@ -70,7 +70,7 @@ jobs:
         run: mvn clean test-compile org.pitest:pitest-maven:mutationCoverage
 
       - name: Upload mutation test reports
-        uses: actions/upload-artifact@v4 
+        uses: actions/upload-artifact@v4
         with:
           name: pitest-reports
           path: target/pit-reports/
@@ -203,7 +203,7 @@ jobs:
 
       - name: Run JMH benchmarks
         run: |
-          mvn clean package -DskipTests
+          mvn clean package -DskipTests -Pbenchmarks
           java -jar target/benchmarks.jar
 
       - name: Upload benchmark results
