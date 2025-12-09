@@ -24,20 +24,19 @@ public class UserService {
 
     /**
      * Creates a new user.
-     * 
+     *
      * @param username The username (must be unique)
      * @param email The email (must be unique)
      * @param password The plain text password
      * @return The created user
-     * 
-     * @requires username != null && !username.isEmpty()
-     * @requires email != null && !email.isEmpty() && isValidEmail(email)
-     * @requires password != null && !password.isEmpty()
-     * @requires !userRepository.existsByUsername(username)
-     * @requires !userRepository.existsByEmail(email)
-     * @ensures \result != null
-     * @ensures userRepository.findByUsername(username).isPresent()
      */
+    //@ requires username != null && !username.isEmpty();
+    //@ requires email != null && !email.isEmpty();
+    //@ requires password != null && !password.isEmpty();
+    //@ requires !userRepository.existsByUsername(username);
+    //@ requires !userRepository.existsByEmail(email);
+    //@ ensures \result != null;
+    //@ ensures userRepository.findByUsername(username).isPresent();
     public User createUser(String username, String email, String password) {
         //@ assert username != null && !username.isEmpty();
         //@ assert email != null && !email.isEmpty();
@@ -62,13 +61,12 @@ public class UserService {
 
     /**
      * Finds a user by username.
-     * 
+     *
      * @param username The username to search for
      * @return Optional containing the user if found
-     * 
-     * @requires username != null && !username.isEmpty()
-     * @ensures \result != null
      */
+    //@ requires username != null && !username.isEmpty();
+    //@ ensures \result != null;
     public Optional<User> findByUsername(String username) {
         //@ assert username != null && !username.isEmpty();
         //@ assert \result != null;
@@ -77,15 +75,16 @@ public class UserService {
 
     /**
      * Validates user credentials.
-     * 
+     *
      * @param username The username
      * @param password The plain text password
      * @return true if credentials are valid, false otherwise
-     * 
-     * @requires username != null && !username.isEmpty()
-     * @requires password != null && !password.isEmpty()
-     * @ensures \result == (user exists and password matches)
      */
+    //@ requires username != null && !username.isEmpty();
+    //@ requires password != null && !password.isEmpty();
+    //@ ensures \result == (userRepository.findByUsername(username).isPresent()
+    //@                     && passwordEncoder.matches(password, userRepository.findByUsername(username).get().getPassword())
+    //@                     && userRepository.findByUsername(username).get().getEnabled());
     public boolean validateCredentials(String username, String password) {
         //@ assert username != null && !username.isEmpty();
         //@ assert password != null && !password.isEmpty();

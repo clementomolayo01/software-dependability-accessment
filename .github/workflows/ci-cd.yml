@@ -51,6 +51,15 @@ jobs:
       - name: Check coverage threshold
         run: mvn jacoco:check
 
+      - name: Generate SBOM (CycloneDX)
+        run: mvn -DskipTests cyclonedx:makeAggregateBom
+
+      - name: Upload SBOM
+        uses: actions/upload-artifact@v4
+        with:
+          name: cyclonedx-bom
+          path: target/bom.xml
+
   mutation-testing:
     name: Mutation Testing (PiTest)
     runs-on: ubuntu-latest
@@ -93,16 +102,23 @@ jobs:
       - name: Install OpenJML
         run: |
           wget -O openjml.zip https://github.com/OpenJML/OpenJML/releases/download/0.17.0-alpha-15/openjml-ubuntu-20.04-0.17.0-alpha-15.zip
-          mkdir openjml
+          mkdir -p openjml
           unzip -d ./openjml openjml.zip
-          ls openjml
+          chmod +x openjml/bin/openjml
+
+      - name: Build classpath for OpenJML
+        run: mvn -q -DincludeScope=compile dependency:build-classpath -Dmdep.outputFile=cp.txt
 
       - name: Verify JML contracts
+        env:
+          OPENJML: ${{ github.workspace }}/openjml/bin/openjml
         run: |
-          mvn clean compile
-          # OpenJML verification would be run here
-          # For now, we'll just ensure compilation succeeds
-          echo "JML verification placeholder - OpenJML integration requires additional setup"
+          mvn -DskipTests compile
+          CP="$(cat cp.txt):target/classes"
+          $OPENJML -cp "$CP" -rac \
+            src/main/java/com/urlshortener/service/UrlShortenerService.java \
+            src/main/java/com/urlshortener/service/UserService.java \
+            src/main/java/com/urlshortener/security/JwtTokenProvider.java
 
   security-scanning:
     name: Security Scanning
@@ -138,9 +154,6 @@ jobs:
         uses: GitGuardian/ggshield-action@master
         env:
           GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
-        with:
-          exit_zero: false
-        continue-on-error: true
 
       - name: Snyk Security Scan
         uses: snyk/actions/maven@master
@@ -148,13 +161,11 @@ jobs:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --severity-threshold=high
-        continue-on-error: true
 
       - name: Build and analyze
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=naijawebmaster1_software-dependability-accessment
-        continue-on-error: true
 
   docker-build:
     name: Docker Build and Push
@@ -202,4 +213,4 @@ jobs:
           cache: maven
 
       - name: Run JMH benchmarks
-        run: mvn clean verify -DskipTests -Pbenchmarks
+        run: mvn clean verify -DskipITs=true -Pbenchmarks

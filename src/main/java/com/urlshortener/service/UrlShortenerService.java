@@ -21,7 +21,6 @@ public class UrlShortenerService {
 
     private final ShortUrlRepository shortUrlRepository;
     private static final int SHORT_CODE_LENGTH = 8;
-    private static final String BASE_URL = "http://localhost:8080/";
 
     @Autowired
     public UrlShortenerService(ShortUrlRepository shortUrlRepository) {
@@ -30,15 +29,15 @@ public class UrlShortenerService {
 
     /**
      * Shortens a long URL to a short code.
-     * 
+     *
      * @param originalUrl The original URL to shorten (must not be null or empty)
      * @param username The username creating the short URL (can be null for anonymous)
      * @return The short code for the URL
-     * 
-     * @requires originalUrl != null && !originalUrl.isEmpty() && isValidUrl(originalUrl)
-     * @ensures \result != null && !\result.isEmpty() && \result.length() == SHORT_CODE_LENGTH
-     * @ensures shortUrlRepository.findByShortCode(\result).isPresent()
      */
+    //@ requires originalUrl != null && !originalUrl.isEmpty();
+    //@ requires isValidUrl(originalUrl);
+    //@ ensures \result != null && !\result.isEmpty() && \result.length() == SHORT_CODE_LENGTH;
+    //@ ensures shortUrlRepository.findByShortCode(\result).isPresent();
     public String shortenUrl(String originalUrl, String username) {
         //@ assert originalUrl != null && !originalUrl.isEmpty();
         
@@ -67,15 +66,14 @@ public class UrlShortenerService {
 
     /**
      * Retrieves the original URL from a short code.
-     * 
+     *
      * @param shortCode The short code to look up (must not be null or empty)
      * @return Optional containing the original URL if found, empty otherwise
-     * 
-     * @requires shortCode != null && !shortCode.isEmpty()
-     * @ensures \result != null
-     * @ensures shortUrlRepository.findByShortCode(shortCode).isPresent() ==>
-     *          \result.isPresent() && \result.get().equals(shortUrlRepository.findByShortCode(shortCode).get().getOriginalUrl())
      */
+    //@ requires shortCode != null && !shortCode.isEmpty();
+    //@ ensures \result != null;
+    //@ ensures shortUrlRepository.findByShortCode(shortCode).isPresent() ==>
+    //@         \result.isPresent() && \result.get().equals(shortUrlRepository.findByShortCode(shortCode).get().getOriginalUrl());
     public Optional<String> getOriginalUrl(String shortCode) {
         //@ assert shortCode != null && !shortCode.isEmpty();
         
@@ -105,13 +103,12 @@ public class UrlShortenerService {
 
     /**
      * Gets statistics for a short URL.
-     * 
+     *
      * @param shortCode The short code to get statistics for
      * @return Optional containing the ShortUrl entity with statistics
-     * 
-     * @requires shortCode != null && !shortCode.isEmpty()
-     * @ensures \result != null
      */
+    //@ requires shortCode != null && !shortCode.isEmpty();
+    //@ ensures \result != null;
     public Optional<ShortUrl> getStatistics(String shortCode) {
         //@ assert shortCode != null && !shortCode.isEmpty();
         
@@ -125,13 +122,12 @@ public class UrlShortenerService {
 
     /**
      * Generates a short code from a URL using SHA-256 hashing.
-     * 
+     *
      * @param url The URL to generate a code for
      * @return A short code of length SHORT_CODE_LENGTH
-     * 
-     * @requires url != null && !url.isEmpty()
-     * @ensures \result != null && \result.length() == SHORT_CODE_LENGTH
      */
+    //@ requires url != null && !url.isEmpty();
+    //@ ensures \result != null && \result.length() == SHORT_CODE_LENGTH;
     private String generateShortCode(String url) {
         //@ assert url != null && !url.isEmpty();
         
@@ -158,13 +154,12 @@ public class UrlShortenerService {
 
     /**
      * Validates if a string is a valid URL.
-     * 
+     *
      * @param url The URL string to validate
      * @return true if the URL is valid, false otherwise
-     * 
-     * @requires url != null
-     * @ensures \result == (url.startsWith("http://") || url.startsWith("https://"))
      */
+    //@ requires url != null;
+    //@ ensures \result == (url.startsWith("http://") || url.startsWith("https://"));
     private boolean isValidUrl(String url) {
         //@ assert url != null;
         boolean result = url.startsWith("http://") || url.startsWith("https://");

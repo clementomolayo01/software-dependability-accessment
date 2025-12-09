@@ -21,13 +21,12 @@ public class JwtTokenProvider {
 
     /**
      * Generates a JWT token for a username.
-     * 
+     *
      * @param username The username to generate token for
      * @return JWT token string
-     * 
-     * @requires username != null && !username.isEmpty()
-     * @ensures \result != null && !\result.isEmpty()
      */
+    //@ requires username != null && !username.isEmpty();
+    //@ ensures \result != null && !\result.isEmpty();
     public String generateToken(String username) {
         //@ assert username != null && !username.isEmpty();
         
@@ -47,13 +46,13 @@ public class JwtTokenProvider {
 
     /**
      * Gets username from JWT token.
-     * 
+     *
      * @param token The JWT token
      * @return Username extracted from token
-     * 
-     * @requires token != null && !token.isEmpty() && validateToken(token)
-     * @ensures \result != null && !\result.isEmpty()
      */
+    //@ requires token != null && !token.isEmpty();
+    //@ requires validateToken(token);
+    //@ ensures \result != null && !\result.isEmpty();
     public String getUsernameFromToken(String token) {
         //@ assert token != null && !token.isEmpty();
         
@@ -66,13 +65,12 @@ public class JwtTokenProvider {
 
     /**
      * Validates a JWT token.
-     * 
+     *
      * @param token The JWT token to validate
      * @return true if token is valid, false otherwise
-     * 
-     * @requires token != null && !token.isEmpty()
-     * @ensures \result == (token is valid and not expired)
      */
+    //@ requires token != null && !token.isEmpty();
+    //@ ensures \result ==> token != null && !token.isEmpty();
     public boolean validateToken(String token) {
         //@ assert token != null && !token.isEmpty();
         
