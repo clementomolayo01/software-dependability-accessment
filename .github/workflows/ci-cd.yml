@@ -13,6 +13,7 @@ env:
   DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
   DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
+
 jobs:
   build-and-test:
     name: Build and Test
@@ -28,6 +29,12 @@ jobs:
           java-version: ${{ env.JAVA_VERSION }}
           distribution: "temurin"
           cache: maven
+
+      - name: Verify Java & Maven
+        run: |
+          echo "JAVA_HOME=$JAVA_HOME"
+          java -version
+          mvn -version
 
       - name: Build with Maven
         run: mvn clean compile -DskipTests
@@ -130,12 +137,13 @@ jobs:
         with:
           fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
 
-      - name: Set up JDK 17
-        id: setup-java
+      - name: Set up JDK 17 (for Sonar + Maven commands)
+        id: setup-java  
         uses: actions/setup-java@v4
         with:
           java-version: 17
-          distribution: "zulu" # Alternative distribution options are available.
+          distribution: "zulu"
+          cache: maven
 
       - name: Cache SonarQube packages
         uses: actions/cache@v4
@@ -156,12 +164,14 @@ jobs:
         env:
           GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
 
+    # Optional: sanity-check the dependency plugin before Snyk
+      - name: Check Maven dependency tree
+        run: mvn dependency:tree -DoutputType=dot --batch-mode --non-recursive --file pom.xml
+
       - name: Snyk Security Scan
-        uses: snyk/actions/maven@master
+        uses: snyk/actions/maven-3-jdk-17@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
-          JAVA_HOME_17_X64: ${{ steps.setup-java.outputs.path }}
         with:
           args: --severity-threshold=high
 
@@ -169,6 +179,7 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=naijawebmaster1_software-dependability-accessment
+
 
   docker-build:
     name: Docker Build and Push
