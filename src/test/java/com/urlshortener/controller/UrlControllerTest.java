@@ -5,20 +5,26 @@ import com.urlshortener.dto.ShortenUrlRequest;
 import com.urlshortener.entity.ShortUrl;
 import com.urlshortener.security.JwtTokenProvider;
 import com.urlshortener.service.UrlShortenerService;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -38,6 +44,11 @@ class UrlControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     void testShortenUrl_ValidRequest_ReturnsShortUrl() throws Exception {
@@ -65,6 +76,28 @@ class UrlControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void testShortenUrl_WithAuthenticatedUser_UsesUsername() throws Exception {
+        // Given
+        ShortenUrlRequest request = new ShortenUrlRequest("https://www.example.com");
+        String shortCode = "ZXCV1234";
+        var authentication = new UsernamePasswordAuthenticationToken("authUser", null, Collections.emptyList());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        when(urlShortenerService.shortenUrl(anyString(), eq("authUser"))).thenReturn(shortCode);
+
+        // When/Then
+        mockMvc.perform(post("/api/shorten")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.shortCode").value(shortCode))
+                .andExpect(jsonPath("$.shortUrl").value("http://localhost:8080/" + shortCode))
+                .andExpect(jsonPath("$.originalUrl").value(request.getUrl()));
+
+        verify(urlShortenerService).shortenUrl(request.getUrl(), "authUser");
     }
 
     @Test

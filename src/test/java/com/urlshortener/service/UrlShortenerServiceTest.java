@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -78,10 +79,10 @@ class UrlShortenerServiceTest {
         // Given
         String username = "testuser";
         ShortUrl existing = new ShortUrl("ABCD1234", validUrl, username);
-        
+
         when(shortUrlRepository.findByShortCode(anyString()))
-            .thenReturn(Optional.of(existing))
-            .thenReturn(Optional.empty());
+                .thenReturn(Optional.of(existing))
+                .thenReturn(Optional.empty());
         when(shortUrlRepository.save(any(ShortUrl.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // When
@@ -141,6 +142,22 @@ class UrlShortenerServiceTest {
     }
 
     @Test
+    void testGetOriginalUrl_ExpiredUrl_ReturnsEmptyAndDoesNotSave() {
+        // Given
+        String shortCode = "EXPIRED1";
+        ShortUrl expiredUrl = new ShortUrl(shortCode, validUrl, "user");
+        expiredUrl.setExpiresAt(LocalDateTime.now().minusDays(1));
+        when(shortUrlRepository.findByShortCode(shortCode)).thenReturn(Optional.of(expiredUrl));
+
+        // When
+        Optional<String> result = urlShortenerService.getOriginalUrl(shortCode);
+
+        // Then
+        assertFalse(result.isPresent());
+        verify(shortUrlRepository, never()).save(any(ShortUrl.class));
+    }
+
+    @Test
     void testGetStatistics_ValidCode_ReturnsStatistics() {
         // Given
         String shortCode = "ABCD1234";
@@ -167,5 +184,13 @@ class UrlShortenerServiceTest {
         // Then
         assertFalse(result.isPresent());
     }
-}
 
+    @Test
+    void testGetStatistics_NullCode_ReturnsEmpty() {
+        // When
+        Optional<ShortUrl> result = urlShortenerService.getStatistics(null);
+
+        // Then
+        assertFalse(result.isPresent());
+    }
+}
