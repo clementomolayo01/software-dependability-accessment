@@ -412,4 +412,4 @@ For issues and questions, please open an issue on GitHub.
 - PiTest developers
 - JMH team
 
-# software-dependability-accessment
+# software-dependability-assessment
