@@ -165,6 +165,7 @@ jobs:
           snyk monitor --all-projects || true
 
       - name: Build and analyze (Sonar)
+        if: github.event_name != 'pull_request'
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
