@@ -26,8 +26,9 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
-          distribution: "temurin"
+          distribution: temurin
           cache: maven
+        id: setup-java
 
       - name: Build with Maven
         run: mvn clean compile -DskipTests
@@ -72,8 +73,9 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
-          distribution: "temurin"
+          distribution: temurin
           cache: maven
+        id: setup-java
 
       - name: Run mutation tests
         run: mvn clean test-compile org.pitest:pitest-maven:mutationCoverage
@@ -92,14 +94,15 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 # Shallow clones should be disabled for a better relevancy of analysis
+          fetch-depth: 0
 
       - name: Set up JDK 17
         id: setup-java
         uses: actions/setup-java@v4
         with:
-          java-version: 17
-          distribution: "zulu" # Alternative distribution options are available.
+          java-version: ${{ env.JAVA_VERSION }}
+          distribution: temurin
+          cache: maven
 
       - name: Cache SonarQube packages
         uses: actions/cache@v4
@@ -120,18 +123,35 @@ jobs:
         env:
           GITGUARDIAN_API_KEY: ${{ secrets.GITGUARDIAN_API_KEY }}
 
+      - name: Debug JAVA_HOME
+        run: |
+          echo "setup-java.outputs.path=${{ steps.setup-java.outputs.path }}"
+          echo "JAVA_HOME (runner env): $JAVA_HOME"
+          echo "java -version:"
+          java -version
+        env:
+          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
+
+      - name: Install Snyk CLI
+        uses: snyk/actions/setup@v2
+        with:
+          version: "latest"
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
       - name: Snyk Security Scan
-        uses: snyk/actions/maven@master
+        run: |
+          # run a maven-enabled Snyk test from the runner (ensures Java is available)
+          snyk test --all-projects --severity-threshold=high || true
+          snyk monitor --all-projects || true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
-          JAVA_HOME_17_X64: ${{ steps.setup-java.outputs.path }}
-        with:
-          args: --severity-threshold=high
 
       - name: Build and analyze (Sonar)
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
         run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=naijawebmaster1_software-dependability-accessment
 
   docker-build:
@@ -176,8 +196,9 @@ jobs:
         uses: actions/setup-java@v4
         with:
           java-version: ${{ env.JAVA_VERSION }}
-          distribution: "temurin"
+          distribution: temurin
           cache: maven
+        id: setup-java
 
       - name: Run JMH benchmarks
         run: mvn clean verify -DskipITs=true -Pbenchmarks

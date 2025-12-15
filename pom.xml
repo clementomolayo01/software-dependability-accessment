@@ -162,6 +162,20 @@
                     <source>17</source>
                     <target>17</target>
                     <encoding>UTF-8</encoding>
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.openjdk.jmh</groupId>
+                            <artifactId>jmh-generator-annprocess</artifactId>
+                            <version>${jmh.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                    <testAnnotationProcessorPaths>
+                        <path>
+                            <groupId>org.openjdk.jmh</groupId>
+                            <artifactId>jmh-generator-annprocess</artifactId>
+                            <version>${jmh.version}</version>
+                        </path>
+                    </testAnnotationProcessorPaths>
                 </configuration>
             </plugin>
 
@@ -325,9 +339,11 @@
                                 <configuration>
                                     <mainClass>org.openjdk.jmh.Main</mainClass>
                                     <classpathScope>test</classpathScope>
+                                    <includeProjectDependencies>true</includeProjectDependencies>
+                                    <includePluginDependencies>true</includePluginDependencies>
                                     <arguments>
                                         <argument>-f</argument>
-                                        <argument>1</argument>
+                                        <argument>0</argument>
                                         <argument>-wi</argument>
                                         <argument>1</argument>
                                         <argument>-i</argument>
