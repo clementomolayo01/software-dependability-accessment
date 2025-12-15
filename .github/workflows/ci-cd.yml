@@ -133,7 +133,7 @@ jobs:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
 
       - name: Install Snyk CLI
-        uses: snyk/actions/setup@v2
+        uses: snyk/actions@v1
         with:
           version: "latest"
         env:
