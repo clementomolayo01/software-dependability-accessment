@@ -134,10 +134,20 @@ jobs:
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
 
-      - name: Install Snyk CLI on runner
-        uses: snyk/actions/setup@v4
+      # --- Snyk fix: ensure Node.js is available and install Snyk CLI via npm ---
+      - name: Set up Node.js (for Snyk)
+        uses: actions/setup-node@v4
         with:
-          version: "latest"
+          node-version: "18"
+          cache: "npm"
+
+      - name: Install Snyk CLI (npm)
+        run: |
+          # Install only if not already present to save time on reruns
+          if ! command -v snyk >/dev/null 2>&1; then
+            npm install -g snyk@latest
+          fi
+          snyk --version
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
