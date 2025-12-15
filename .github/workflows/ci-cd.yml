@@ -89,6 +89,8 @@ jobs:
   security-scanning:
     name: Security Scanning
     runs-on: ubuntu-latest
+    needs: build-and-test
+    timeout-minutes: 60
 
     steps:
       - name: Checkout code
@@ -132,21 +134,26 @@ jobs:
         env:
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
 
-      - name: Install Snyk CLI
-        uses: snyk/actions@v1
+      - name: Install Snyk CLI on runner
+        uses: snyk/actions/setup@v3
         with:
           version: "latest"
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
 
+      - name: Ensure Maven dependencies are available
+        run: mvn -B -DskipTests -DskipITs package
+        env:
+          JAVA_HOME: ${{ steps.setup-java.outputs.path }}
+
       - name: Snyk Security Scan
-        run: |
-          # run a maven-enabled Snyk test from the runner (ensures Java is available)
-          snyk test --all-projects --severity-threshold=high || true
-          snyk monitor --all-projects || true
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
           JAVA_HOME: ${{ steps.setup-java.outputs.path }}
+        run: |
+          set -o pipefail
+          snyk test --all-projects --severity-threshold=high || true
+          snyk monitor --all-projects || true
 
       - name: Build and analyze (Sonar)
         env:
