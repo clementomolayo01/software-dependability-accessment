@@ -33,10 +33,10 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/login")
+   @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody AuthRequest request) {
         if (userService.validateCredentials(request.getUsername(), request.getPassword())) {
-            String token = tokenProvider.generateToken(request.getUsername());
+             String token = tokenProvider.generateToken(request.getUsername());
             return ResponseEntity.ok(new AuthResponse(token, request.getUsername()));
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
