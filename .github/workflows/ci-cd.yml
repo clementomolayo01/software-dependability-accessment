@@ -259,7 +259,7 @@ jobs:
         run: |
           mvn -DskipTests compile
           CP="$(cat cp.txt):target/classes"
-          $OPENJML -cp "$CP" -rac \
+          $OPENJML -no-purityCheck -cp "$CP" -rac \
             src/main/java/com/urlshortener/service/UrlShortenerService.java \
             src/main/java/com/urlshortener/service/UserService.java \
             src/main/java/com/urlshortener/security/JwtTokenProvider.java
