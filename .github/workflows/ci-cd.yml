@@ -248,14 +248,14 @@ jobs:
           wget -O openjml.zip https://github.com/OpenJML/OpenJML/releases/download/0.17.0-alpha-15/openjml-ubuntu-20.04-0.17.0-alpha-15.zip
           mkdir -p openjml
           unzip -d ./openjml openjml.zip
-          chmod +x openjml/bin/openjml
+          chmod +x openjml/openjml
 
       - name: Build classpath for OpenJML
         run: mvn -q -DincludeScope=compile dependency:build-classpath -Dmdep.outputFile=cp.txt
 
       - name: Verify JML contracts
         env:
-          OPENJML: ${{ github.workspace }}/openjml/bin/openjml
+          OPENJML: ${{ github.workspace }}/openjml/openjml
         run: |
           mvn -DskipTests compile
           CP="$(cat cp.txt):target/classes"
