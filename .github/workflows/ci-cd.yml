@@ -5,6 +5,12 @@ on:
     branches: [main, develop]
   pull_request:
     branches: [main, develop]
+  workflow_dispatch:
+    inputs:
+      run_heavy_jobs:
+        description: "Run heavy jobs (mutation testing, JMH benchmarks)"
+        required: false
+        default: "false"
 
 env:
   JAVA_VERSION: "17"
@@ -64,6 +70,7 @@ jobs:
   mutation-testing:
     name: Mutation Testing (PiTest)
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && inputs.run_heavy_jobs == 'true'
 
     steps:
       - name: Checkout code
@@ -204,6 +211,7 @@ jobs:
   performance-benchmarks:
     name: Performance Benchmarks (JMH)
     runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' && inputs.run_heavy_jobs == 'true'
 
     steps:
       - name: Checkout code
