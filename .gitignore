@@ -45,4 +45,32 @@ coverage/
 *.bak
 *.swp
 *~
+secrets.env
+*.key
+*.pem
+*.p12
 
+# Misc
+*.log
+*.tmp
+
+# LaTeX build artifacts
+report/*.aux
+report/*.log
+report/*.out
+report/*.toc
+report/*.fls
+report/*.fdb_latexmk
+report/*.synctex.gz
+report/main.pdf      # ignore built PDF (artifact uploaded by CI)
+report/*.bbl
+report/*.blg
+report/.latexmk/
+
+# Coverage & mutation reports
+coverage/
+jacoco.exec
+report/target/
+pit-reports/
+pit-reports/
+report/artifacts/
