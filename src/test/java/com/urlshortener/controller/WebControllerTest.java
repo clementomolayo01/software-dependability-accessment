@@ -6,6 +6,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
+import org.springframework.security.core.Authentication;
+import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -63,4 +65,20 @@ class WebControllerTest {
         assertEquals("ABC123", model.getAttribute("shortCode"));
         assertNull(model.getAttribute("token"));
     }
+
+    @Test
+   void dashboard_WhenMockAuthenticated_SetsUsername() {
+       Authentication auth = Mockito.mock(Authentication.class);
+        Mockito.when(auth.isAuthenticated()).thenReturn(true);
+       Mockito.when(auth.getName()).thenReturn("alice");
+       SecurityContextHolder.getContext().setAuthentication(auth);
+
+       Model model = new ExtendedModelMap();
+        String view = controller.dashboard(model);
+
+       assertEquals("dashboard", view);
+        assertEquals("alice", model.getAttribute("username"));
+       assertNull(model.getAttribute("token"));
+    }
+
 }

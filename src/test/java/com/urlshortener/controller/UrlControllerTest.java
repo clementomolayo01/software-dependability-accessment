@@ -50,12 +50,18 @@ class UrlControllerTest {
         SecurityContextHolder.clearContext();
     }
 
-    @Test
-    void testShortenUrl_ValidRequest_ReturnsShortUrl() throws Exception {
+   @Test
+    void testShortenUrl_AnonymousAuthenticated_TreatedAsUnauthenticated() throws Exception {
         // Given
         ShortenUrlRequest request = new ShortenUrlRequest("https://www.example.com");
-        String shortCode = "ABCD1234";
-        when(urlShortenerService.shortenUrl(anyString(), any())).thenReturn(shortCode);
+        String shortCode = "ANON1";
+
+        // set an Authentication that isAuthenticated() == true but getName() == "anonymousUser"
+        var authentication = new UsernamePasswordAuthenticationToken("anonymousUser", null, Collections.emptyList());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        // Expect service to be called with null username
+        when(urlShortenerService.shortenUrl(anyString(), eq((String) null))).thenReturn(shortCode);
 
         // When/Then
         mockMvc.perform(post("/api/shorten")
@@ -63,7 +69,10 @@ class UrlControllerTest {
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.shortCode").value(shortCode))
-                .andExpect(jsonPath("$.originalUrl").value("https://www.example.com"));
+                .andExpect(jsonPath("$.shortUrl").value("http://localhost:8080/" + shortCode))
+                .andExpect(jsonPath("$.originalUrl").value(request.getUrl()));
+
+        verify(urlShortenerService).shortenUrl(request.getUrl(), (String) null);
     }
 
     @Test
@@ -143,7 +152,28 @@ class UrlControllerTest {
                 .andExpect(status().isFound())
                 .andExpect(header().string("Location", originalUrl));
     }
+  @Test
+    void testShortenUrl_WithoutAuthentication_UsesNullUsername() throws Exception {
+        // Given
+        ShortenUrlRequest request = new ShortenUrlRequest("https://www.example.com");
+        String shortCode = "NOAUTH1";
 
+        // ensure no authentication in context
+        SecurityContextHolder.clearContext();
+
+        when(urlShortenerService.shortenUrl(anyString(), eq((String) null))).thenReturn(shortCode);
+
+        // When/Then
+        mockMvc.perform(post("/api/shorten")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.shortCode").value(shortCode))
+                .andExpect(jsonPath("$.shortUrl").value("http://localhost:8080/" + shortCode))
+                .andExpect(jsonPath("$.originalUrl").value(request.getUrl()));
+
+        verify(urlShortenerService).shortenUrl(request.getUrl(), (String) null);
+    }
     @Test
     void testRedirect_InvalidCode_ReturnsNotFound() throws Exception {
         // Given
